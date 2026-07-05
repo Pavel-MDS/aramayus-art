@@ -9,13 +9,14 @@ export const metadata = {
     "Visualiza las prendas de alpaca sobre un avatar 3D con tus medidas antes de comprar.",
 };
 
-export default function ProbadorPage({
+export default async function ProbadorPage({
   searchParams,
 }: {
-  searchParams: { producto?: string };
+  searchParams: Promise<{ producto?: string }>;
 }) {
-  const initial = searchParams.producto
-    ? products.find((p) => p.id === searchParams.producto)
+  const { producto } = await searchParams;
+  const initial = producto
+    ? products.find((p) => p.id === producto)
     : undefined;
 
   return (

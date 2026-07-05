@@ -7,13 +7,14 @@ export const metadata = {
   title: "Probador Virtual — Aramayu's Art",
 };
 
-export default function ProbadorPage({
+export default async function ProbadorPage({
   searchParams,
 }: {
-  searchParams: { producto?: string };
+  searchParams: Promise<{ producto?: string }>;
 }) {
-  const initial = searchParams.producto
-    ? products.find((p) => p.id === searchParams.producto) ?? products[0]
+  const { producto } = await searchParams;
+  const initial = producto
+    ? products.find((p) => p.id === producto) ?? products[0]
     : products[0];
 
   return (
