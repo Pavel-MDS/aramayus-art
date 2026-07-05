@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* ── Aramayu's Art — Design Tokens ── */
+  --bg-cream: #F4EFE5;
+  --bg-cream-deep: #EFE7D8;
+  --text-dark: #211712;
+  --accent-terracotta: #B97A4D;
+  --accent-gold: #C9A876;
+  --text-muted: #7A7066;
+  --border-subtle: #E0D7C8;
+  --status-ok: #5C7A3D;
+  --status-low: #A3432E;
+
+  --font-cormorant: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-outfit: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+}
+
+@theme inline {
+  --color-cream: var(--bg-cream);
+  --color-cream-deep: var(--bg-cream-deep);
+  --color-dark: var(--text-dark);
+  --color-terracotta: var(--accent-terracotta);
+  --color-gold: var(--accent-gold);
+  --color-muted: var(--text-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-status-ok: var(--status-ok);
+  --color-status-low: var(--status-low);
+
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-outfit);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-cream);
+  color: var(--text-dark);
+  font-family: var(--font-sans), Arial, sans-serif;
+}
+
+.font-serif-display {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+/* Eyebrow label style used throughout */
+.eyebrow {
+  font-family: var(--font-sans), Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+}
+
+/* Visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-terracotta);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
