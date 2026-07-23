@@ -280,7 +280,7 @@ export function ProductDetailClient({
             <Button
               variant="outline"
               fullWidth
-              onClick={() => router.push(`/probador-3d?producto=${product.id}`)}
+              onClick={() => router.push(`/probador-ia?producto=${product.id}`)}
             >
               Probar virtualmente
             </Button>
