@@ -1,6 +1,5 @@
+// app/producto/[id]/page.tsx
 import { notFound } from "next/navigation";
-import { NavBar } from "@/components/NavBar";
-import { Footer } from "@/components/Footer";
 import { products } from "@/lib/products";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
 
@@ -35,11 +34,5 @@ export default async function ProductoPage({
     .filter((p) => p.id !== product.id && p.stock !== "agotado")
     .slice(0, 3);
 
-  return (
-    <>
-      <NavBar />
-      <ProductDetailClient product={product} related={related} />
-      <Footer />
-    </>
-  );
+  return <ProductDetailClient product={product} related={related} />;
 }

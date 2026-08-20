@@ -1,13 +1,16 @@
+// ProductDetailClient.tsx
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Share2, ChevronRight, Minus, Plus } from "lucide-react";
+import { Heart, Share2, ChevronRight, Minus, Plus, Ruler } from "lucide-react";
 import { Product } from "@/lib/products";
 import { Button } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
+import { useCart } from "@/context/CartContext";
+import { SizeSuggester } from "./SizeSuggester";
 
 const TABS = ["Detalles", "Cuidados", "Envíos", "Reseñas"] as const;
 type Tab = (typeof TABS)[number];
@@ -76,6 +79,7 @@ export function ProductDetailClient({
   related: Product[];
 }) {
   const router = useRouter();
+  const { addItem } = useCart();
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(
@@ -85,6 +89,7 @@ export function ProductDetailClient({
   const [activeTab, setActiveTab] = useState<Tab>("Detalles");
   const [wished, setWished] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [showSuggester, setShowSuggester] = useState(false);
 
   // Placeholder gradients para simular 4 ángulos de foto
   const galleryImages = product.images && product.images.length > 0
@@ -95,9 +100,13 @@ export function ProductDetailClient({
   const isSoldOut = product.stock === "agotado";
 
   function handleAddToCart() {
+  if (selectedSize && product) {
+    const colorHex = product.colors[selectedColor] || product.colors[0];
+    addItem(product, colorHex, selectedSize, qty);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2500);
   }
+}
 
   return (
     <main className="max-w-[1280px] mx-auto px-6 sm:px-10">
@@ -205,8 +214,12 @@ export function ProductDetailClient({
           <div className="mb-5">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[11px] text-dark">Talla</p>
-              <button className="text-[10px] text-terracotta hover:text-dark transition-colors">
-                Guía de tallas →
+              <button
+                onClick={() => setShowSuggester(!showSuggester)}
+                className="flex items-center gap-1.5 text-[11px] font-medium text-terracotta hover:text-dark border border-terracotta/30 hover:border-dark/30 px-3 py-1 rounded-full transition-colors"
+              >
+                <Ruler size={12} />
+                {showSuggester ? "Cerrar guía" : "¿Qué talla soy?"}
               </button>
             </div>
             <div className="flex gap-2 flex-wrap">
@@ -230,6 +243,14 @@ export function ProductDetailClient({
                 );
               })}
             </div>
+            {showSuggester && (
+              <div className="mt-3">
+                <SizeSuggester
+                  availableSizes={product.sizes.filter(s => !product.unavailableSizes?.includes(s))}
+                  onSizeSelected={(talla) => setSelectedSize(talla)}
+                />
+              </div>
+            )}
           </div>
 
           {/* Stock + cantidad */}

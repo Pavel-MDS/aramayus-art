@@ -1,3 +1,5 @@
+//ProbadorIA.tsx
+
 "use client";
 
 import { useState, useRef, useCallback } from "react";

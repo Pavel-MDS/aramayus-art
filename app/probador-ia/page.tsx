@@ -1,5 +1,4 @@
-import { NavBar } from "@/components/NavBar";
-import { Footer } from "@/components/Footer";
+// app/probador-ia/page.tsx
 import { ProbadorIA } from "@/components/ProbadorIA";
 import { products } from "@/lib/products";
 
@@ -17,11 +16,5 @@ export default async function ProbadorIAPage({
     ? products.find((p) => p.id === producto)
     : undefined;
 
-  return (
-    <>
-      <NavBar />
-      <ProbadorIA initialProduct={initial} />
-      <Footer />
-    </>
-  );
+  return <ProbadorIA initialProduct={initial} />;
 }

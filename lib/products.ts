@@ -1,3 +1,4 @@
+// products.ts
 export type StockStatus = "disponible" | "ultimas-unidades" | "agotado";
 
 export interface Product {

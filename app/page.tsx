@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { NavBar } from "@/components/NavBar";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
 import { PromoCarousel } from "@/components/PromoCarousel";
@@ -99,7 +97,7 @@ export default function Home() {
   const featured = products.slice(0, 4);
 
   return (
-    <>
+    <main>
       {/* Announcement bar */}
       <div className="bg-dark text-center py-2 px-4">
         <p className="text-[10px] tracking-[0.08em] uppercase">
@@ -110,173 +108,167 @@ export default function Home() {
         </p>
       </div>
 
-      <NavBar />
+      {/* ── Hero ── */}
+      <section className="max-w-[1280px] mx-auto px-6 sm:px-10 py-12 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div className="eyebrow mb-4">Cusco Alpaca · Pre-launch</div>
+          <h1 className="font-serif-display text-[42px] sm:text-[56px] leading-[1.05] text-dark">
+            Lujo que{" "}
+            <em className="text-terracotta not-italic font-serif-display italic">
+              gives back.
+            </em>
+          </h1>
+          <p className="text-[15px] sm:text-base text-muted leading-relaxed mt-5 max-w-md">
+            Más que una prenda. Una elección consciente que protege ecosistemas
+            andinos, apoya comunidades del Cusco y redefine la moda sostenible
+            moderna.
+          </p>
+          <p className="text-[12px] text-terracotta mt-3">
+            ✦ Beneficios exclusivos para los primeros 100 miembros
+          </p>
 
-      <main>
-        {/* ── Hero ── */}
-        <section className="max-w-[1280px] mx-auto px-6 sm:px-10 py-12 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="eyebrow mb-4">Cusco Alpaca · Pre-launch</div>
-            <h1 className="font-serif-display text-[42px] sm:text-[56px] leading-[1.05] text-dark">
-              Lujo que{" "}
-              <em className="text-terracotta not-italic font-serif-display italic">
-                gives back.
-              </em>
-            </h1>
-            <p className="text-[15px] sm:text-base text-muted leading-relaxed mt-5 max-w-md">
-              Más que una prenda. Una elección consciente que protege ecosistemas
-              andinos, apoya comunidades del Cusco y redefine la moda sostenible
-              moderna.
-            </p>
-            <p className="text-[12px] text-terracotta mt-3">
-              ✦ Beneficios exclusivos para los primeros 100 miembros
-            </p>
-
-            <div className="flex flex-wrap gap-3 mt-8">
-              <Link href="/catalogo">
-                <Button variant="primary">Acceso anticipado</Button>
-              </Link>
-              <Link href="/catalogo">
-                <Button variant="outline">Ver colección</Button>
-              </Link>
-            </div>
-
-            <div className="flex gap-8 mt-10 pt-8 border-t border-border-subtle">
-              <div>
-                <div className="font-serif-display text-2xl text-dark">87</div>
-                <div className="text-[10px] text-muted uppercase tracking-wide mt-0.5">
-                  Cupos restantes
-                </div>
-              </div>
-              <div>
-                <div className="font-serif-display text-2xl text-dark">100%</div>
-                <div className="text-[10px] text-muted uppercase tracking-wide mt-0.5">
-                  Fibra natural
-                </div>
-              </div>
-              <div>
-                <div className="font-serif-display text-2xl text-dark">0</div>
-                <div className="text-[10px] text-muted uppercase tracking-wide mt-0.5">
-                  Sintéticos
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <PromoCarousel />
-        </section>
-
-        {/* ── Institucional ── */}
-        <section id="historia" className="bg-cream-deep py-16 sm:py-20">
-          <div className="max-w-[1280px] mx-auto px-6 sm:px-10">
-            <div className="text-center max-w-xl mx-auto mb-12">
-              <div className="eyebrow mb-3">Nuestra historia</div>
-              <h2 className="font-serif-display text-[28px] sm:text-[36px] leading-tight text-dark">
-                Tres generaciones{" "}
-                <em className="text-terracotta not-italic italic">tejiendo</em>{" "}
-                futuro.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-              {institucional.map(({ title, text, Icon }) => (
-                <div key={title} className="text-center">
-                  <Icon />
-                  <h3 className="text-[13px] font-medium text-dark mb-1.5 mt-4">
-                    {title}
-                  </h3>
-                  <p className="text-[12px] text-muted leading-relaxed">{text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Productos destacados ── */}
-        <section className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 sm:py-20">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <div className="eyebrow mb-3">Productos destacados</div>
-              <h2 className="font-serif-display text-[28px] sm:text-[32px] text-dark">
-                Lo más buscado
-              </h2>
-            </div>
-            <Link
-              href="/catalogo"
-              className="text-[11px] uppercase tracking-[0.05em] text-terracotta hover:text-dark transition-colors whitespace-nowrap"
-            >
-              Ver todo →
+          <div className="flex flex-wrap gap-3 mt-8">
+            <Link href="/catalogo">
+              <Button variant="primary">Acceso anticipado</Button>
+            </Link>
+            <Link href="/catalogo">
+              <Button variant="outline">Ver colección</Button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-7">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          <div className="flex gap-8 mt-10 pt-8 border-t border-border-subtle">
+            <div>
+              <div className="font-serif-display text-2xl text-dark">87</div>
+              <div className="text-[10px] text-muted uppercase tracking-wide mt-0.5">
+                Cupos restantes
+              </div>
+            </div>
+            <div>
+              <div className="font-serif-display text-2xl text-dark">100%</div>
+              <div className="text-[10px] text-muted uppercase tracking-wide mt-0.5">
+                Fibra natural
+              </div>
+            </div>
+            <div>
+              <div className="font-serif-display text-2xl text-dark">0</div>
+              <div className="text-[10px] text-muted uppercase tracking-wide mt-0.5">
+                Sintéticos
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <PromoCarousel />
+      </section>
+
+      {/* ── Institucional ── */}
+      <section id="historia" className="bg-cream-deep py-16 sm:py-20">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-10">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <div className="eyebrow mb-3">Nuestra historia</div>
+            <h2 className="font-serif-display text-[28px] sm:text-[36px] leading-tight text-dark">
+              Tres generaciones{" "}
+              <em className="text-terracotta not-italic italic">tejiendo</em>{" "}
+              futuro.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {institucional.map(({ title, text, Icon }) => (
+              <div key={title} className="text-center">
+                <Icon />
+                <h3 className="text-[13px] font-medium text-dark mb-1.5 mt-4">
+                  {title}
+                </h3>
+                <p className="text-[12px] text-muted leading-relaxed">{text}</p>
+              </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Testimonios ── */}
-        <section className="bg-dark py-16 sm:py-20">
-          <div className="max-w-[1280px] mx-auto px-6 sm:px-10">
-            <div className="text-center mb-12">
-              <div className="eyebrow mb-3">Testimonios</div>
-              <h2 className="font-serif-display text-[28px] sm:text-[32px] text-cream">
-                Voces que confían en nosotros
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              {testimonials.map((t) => (
-                <div
-                  key={t.author}
-                  className="bg-cream/[0.06] border border-cream/15 rounded-lg p-6"
-                >
-                  <div className="text-gold text-sm mb-3">★★★★★</div>
-                  <p className="text-[13px] text-cream/80 leading-relaxed mb-4">
-                    &quot;{t.quote}&quot;
-                  </p>
-                  <p className="text-[11px] text-gold">
-                    — {t.author}, {t.location}
-                  </p>
-                </div>
-              ))}
-            </div>
+      {/* ── Productos destacados ── */}
+      <section className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 sm:py-20">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <div className="eyebrow mb-3">Productos destacados</div>
+            <h2 className="font-serif-display text-[28px] sm:text-[32px] text-dark">
+              Lo más buscado
+            </h2>
           </div>
-        </section>
+          <Link
+            href="/catalogo"
+            className="text-[11px] uppercase tracking-[0.05em] text-terracotta hover:text-dark transition-colors whitespace-nowrap"
+          >
+            Ver todo →
+          </Link>
+        </div>
 
-        {/* ── Contacto ── */}
-        <section
-          id="contacto"
-          className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 sm:py-20 text-center"
-        >
-          <div className="eyebrow mb-3">Únete a la lista</div>
-          <h2 className="font-serif-display text-[28px] sm:text-[36px] text-dark mb-4">
-            Sé parte de los primeros 100.
-          </h2>
-          <p className="text-[14px] text-muted max-w-md mx-auto mb-8">
-            Déjanos tu correo y recibe acceso anticipado, descuentos exclusivos y
-            novedades de la colección.
-          </p>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="text"
-              placeholder="Tu nombre"
-              className="flex-1 px-4 py-3 rounded-md border border-border-subtle bg-transparent text-[13px] placeholder:text-muted focus:border-terracotta outline-none transition-colors"
-            />
-            <input
-              type="email"
-              placeholder="Tu correo"
-              className="flex-1 px-4 py-3 rounded-md border border-border-subtle bg-transparent text-[13px] placeholder:text-muted focus:border-terracotta outline-none transition-colors"
-            />
-            <Button variant="primary" type="submit">
-              Unirme
-            </Button>
-          </form>
-        </section>
-      </main>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-7">
+          {featured.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
 
-      <Footer />
-    </>
+      {/* ── Testimonios ── */}
+      <section className="bg-dark py-16 sm:py-20">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-10">
+          <div className="text-center mb-12">
+            <div className="eyebrow mb-3">Testimonios</div>
+            <h2 className="font-serif-display text-[28px] sm:text-[32px] text-cream">
+              Voces que confían en nosotros
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {testimonials.map((t) => (
+              <div
+                key={t.author}
+                className="bg-cream/[0.06] border border-cream/15 rounded-lg p-6"
+              >
+                <div className="text-gold text-sm mb-3">★★★★★</div>
+                <p className="text-[13px] text-cream/80 leading-relaxed mb-4">
+                  &quot;{t.quote}&quot;
+                </p>
+                <p className="text-[11px] text-gold">
+                  — {t.author}, {t.location}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Contacto ── */}
+      <section
+        id="contacto"
+        className="max-w-[1280px] mx-auto px-6 sm:px-10 py-16 sm:py-20 text-center"
+      >
+        <div className="eyebrow mb-3">Únete a la lista</div>
+        <h2 className="font-serif-display text-[28px] sm:text-[36px] text-dark mb-4">
+          Sé parte de los primeros 100.
+        </h2>
+        <p className="text-[14px] text-muted max-w-md mx-auto mb-8">
+          Déjanos tu correo y recibe acceso anticipado, descuentos exclusivos y
+          novedades de la colección.
+        </p>
+        <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Tu nombre"
+            className="flex-1 px-4 py-3 rounded-md border border-border-subtle bg-transparent text-[13px] placeholder:text-muted focus:border-terracotta outline-none transition-colors"
+          />
+          <input
+            type="email"
+            placeholder="Tu correo"
+            className="flex-1 px-4 py-3 rounded-md border border-border-subtle bg-transparent text-[13px] placeholder:text-muted focus:border-terracotta outline-none transition-colors"
+          />
+          <Button variant="primary" type="submit">
+            Unirme
+          </Button>
+        </form>
+      </section>
+    </main>
   );
 }

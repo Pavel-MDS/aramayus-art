@@ -1,5 +1,4 @@
-import { NavBar } from "@/components/NavBar";
-import { Footer } from "@/components/Footer";
+// app/probador/page.tsx
 import { ProbadorClient } from "@/components/ProbadorClient";
 import { products } from "@/lib/products";
 
@@ -17,11 +16,5 @@ export default async function ProbadorPage({
     ? products.find((p) => p.id === producto) ?? products[0]
     : products[0];
 
-  return (
-    <>
-      <NavBar />
-      <ProbadorClient products={products} initialProduct={initial} />
-      <Footer />
-    </>
-  );
+  return <ProbadorClient products={products} initialProduct={initial} />;
 }
