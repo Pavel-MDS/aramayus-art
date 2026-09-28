@@ -4,7 +4,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+// import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/Button';
 import { Eye, EyeOff, Check } from 'lucide-react';
 
@@ -17,7 +18,7 @@ export default function RegistroPage() {
   const [error, setError]       = useState('');
   const [success, setSuccess]   = useState(false);
   const [loading, setLoading]   = useState(false);
-  const supabase = createClient();
+  const { registro: registrarUsuario } = useAuth();
 
   const validaciones = [
     { label: 'Al menos 8 caracteres', ok: password.length >= 8 },
@@ -26,34 +27,24 @@ export default function RegistroPage() {
   ];
 
   const handleRegistro = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    if (!validaciones.every(v => v.ok)) {
-      setError('La contraseña no cumple los requisitos');
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { nombre } },
-    });
-
-    if (error) {
-      setError(error.message === 'User already registered'
-        ? 'Este correo ya está registrado'
-        : 'Error al crear la cuenta'
-      );
-      setLoading(false);
-      return;
-    }
-
-    setSuccess(true);
+  if (!validaciones.every(v => v.ok)) {
+    setError('La contraseña no cumple los requisitos');
     setLoading(false);
-  };
+    return;
+  }
+
+  try {
+    await registrarUsuario(nombre, email, password);
+    setSuccess(true);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Error al crear la cuenta');
+  }
+  setLoading(false);
+};
 
   if (success) {
     return (

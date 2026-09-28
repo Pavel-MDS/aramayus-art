@@ -1,11 +1,6 @@
-// app/producto/[id]/page.tsx
 import { notFound } from "next/navigation";
-import { products } from "@/lib/products";
+import { fetchProducto, fetchProductos } from "@/lib/products";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
-
-export function generateStaticParams() {
-  return products.map((p) => ({ id: p.id }));
-}
 
 export async function generateMetadata({
   params,
@@ -13,7 +8,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = await fetchProducto(id);
   if (!product) return { title: "Producto no encontrado" };
   return {
     title: `${product.name} — Aramayu's Art`,
@@ -27,10 +22,11 @@ export default async function ProductoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = await fetchProducto(id);
   if (!product) notFound();
 
-  const related = products
+  const { productos: todos } = await fetchProductos({ pageSize: 50 });
+  const related = todos
     .filter((p) => p.id !== product.id && p.stock !== "agotado")
     .slice(0, 3);
 

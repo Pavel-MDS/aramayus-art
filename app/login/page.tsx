@@ -4,7 +4,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+// import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/Button';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -17,8 +18,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
-
+  const { login } = useAuth();
   useEffect(() => {
     // Mensaje de registro exitoso
     if (searchParams.get('registro') === 'exitoso') {
@@ -31,30 +31,20 @@ export default function LoginPage() {
   }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
+  e.preventDefault();
+  setError('');
+  setSuccess('');
+  setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message === 'Invalid login credentials'
-        ? 'Correo o contraseña incorrectos'
-        : 'Error al iniciar sesión'
-      );
-      setLoading(false);
-      return;
-    }
-
-    // Redirigir a la página que intentaba acceder o al perfil
+  try {
+    await login(email, password);
     const redirect = searchParams.get('redirect') || '/perfil';
     router.push(redirect);
-  };
-
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-cream">
       <div className="w-full max-w-sm">

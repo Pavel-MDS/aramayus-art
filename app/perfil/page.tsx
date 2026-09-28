@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { createClient } from '@/lib/supabase/client';
+//import { createClient } from '@/lib/supabase/client';
+import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/Button';
 import { User, Ruler, LogOut, Check } from 'lucide-react';
 
@@ -13,7 +14,6 @@ export default function PerfilPage() {
   const [saving, setSaving]   = useState(false);
   const [saved, setSaved]     = useState(false);
   const [error, setError]     = useState('');
-  const supabase = createClient();
 
   const [form, setForm] = useState({
     nombre:      perfil?.nombre      ?? '',
@@ -31,35 +31,33 @@ export default function PerfilPage() {
   };
 
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setError('');
+  e.preventDefault();
+  setSaving(true);
+  setError('');
 
-    const { error } = await supabase
-      .from('perfiles')
-      .update({
-        nombre:      form.nombre,
-        altura:      form.altura      || null,
-        peso:        form.peso        || null,
-        pecho:       form.pecho       || null,
-        cintura:     form.cintura     || null,
-        cadera:      form.cadera      || null,
-        hombros:     form.hombros     || null,
+  try {
+    await apiFetch('/usuarios/perfil', {
+      method: 'PUT',
+      body: JSON.stringify({
+        nombre: form.nombre,
+        altura: form.altura || null,
+        peso: form.peso || null,
+        pecho: form.pecho || null,
+        cintura: form.cintura || null,
+        cadera: form.cadera || null,
+        hombros: form.hombros || null,
         talla_usual: form.talla_usual || null,
-        updated_at:  new Date().toISOString(),
-      })
-      .eq('id', user!.id);
+      }),
+    });
+    await refreshPerfil();
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  } catch {
+    setError('Error al guardar los cambios');
+  }
 
-    if (error) {
-      setError('Error al guardar los cambios');
-    } else {
-      await refreshPerfil();
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    }
-
-    setSaving(false);
-  };
+  setSaving(false);
+};
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-12">

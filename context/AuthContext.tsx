@@ -2,14 +2,16 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { apiFetch, setTokenCookie, clearTokenCookie } from '@/lib/api';
 
-interface Perfil {
+interface Usuario {
   id: string;
   nombre: string;
   email: string;
-  avatar_url?: string;
+  rol: string;
+}
+
+interface Perfil extends Usuario {
   altura?: number;
   peso?: number;
   pecho?: number;
@@ -20,64 +22,77 @@ interface Perfil {
 }
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: Usuario | null;
   perfil: Perfil | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  registro: (nombre: string, email: string, password: string) => Promise<void>;
+  signOut: () => void;
   refreshPerfil: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser]       = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [perfil, setPerfil]   = useState<Perfil | null>(null);
+  const [user, setUser] = useState<Usuario | null>(null);
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
-  const fetchPerfil = async (userId: string) => {
-    const { data } = await supabase
-      .from('perfiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    if (data) setPerfil(data);
-  };
-
-  const refreshPerfil = async () => {
-    if (user) await fetchPerfil(user.id);
+  const cargarPerfil = async () => {
+    try {
+      const data = await apiFetch('/usuarios/perfil');
+      setUser({ id: data.id, nombre: data.nombre, email: data.email, rol: data.rol });
+      setPerfil(data);
+    } catch {
+      setUser(null);
+      setPerfil(null);
+      localStorage.removeItem('token');
+      clearTokenCookie();
+    }
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) fetchPerfil(session.user.id);
+    const token = localStorage.getItem('token');
+    if (token) {
+      cargarPerfil().finally(() => setLoading(false));
+    } else {
       setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) await fetchPerfil(session.user.id);
-        else setPerfil(null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    }
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const login = async (email: string, password: string) => {
+    const data = await apiFetch('/usuarios/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    localStorage.setItem('token', data.token);
+    setTokenCookie(data.token);
+    await cargarPerfil();
+  };
+
+  const registro = async (nombre: string, email: string, password: string) => {
+    const data = await apiFetch('/usuarios/registro', {
+      method: 'POST',
+      body: JSON.stringify({ nombre, email, password }),
+    });
+    localStorage.setItem('token', data.token);
+    setTokenCookie(data.token);
+    setUser(data.usuario);
+  };
+
+  const signOut = () => {
+    localStorage.removeItem('token');
+    clearTokenCookie();
+    setUser(null);
     setPerfil(null);
   };
 
+  const refreshPerfil = async () => {
+    await cargarPerfil();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, perfil, loading, signOut, refreshPerfil }}>
+    <AuthContext.Provider value={{ user, perfil, loading, login, registro, signOut, refreshPerfil }}>
       {children}
     </AuthContext.Provider>
   );

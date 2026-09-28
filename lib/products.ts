@@ -164,3 +164,94 @@ export const testimonials = [
     location: "Arequipa",
   },
 ];
+// ─────────────────────────────────────────────
+// Adaptador: respuesta del backend Express → tipo Product
+// ─────────────────────────────────────────────
+import { API_URL } from "./api";
+
+interface InventarioAPI {
+  id: number;
+  talla: string;
+  color: string | null;
+  stock: number;
+}
+
+interface ProductoAPI {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  precio: string;
+  precio_oferta: string | null;
+  tipo: string | null;
+  categoria: string | null;
+  destacado: boolean;
+  imagen_principal: string | null;
+  stock_total?: number;
+  inventario?: InventarioAPI[];
+  imagenes?: { url: string; es_principal: boolean }[];
+}
+
+export function adaptarProducto(p: ProductoAPI): Product {
+  const inventario = p.inventario || [];
+  const tallasUnicas = [...new Set(inventario.map(i => i.talla))];
+  const coloresUnicos = [...new Set(inventario.filter(i => i.color).map(i => i.color as string))];
+  const tallasConStock = new Set(inventario.filter(i => i.stock > 0).map(i => i.talla));
+  const unavailableSizes = tallasUnicas.filter(t => !tallasConStock.has(t));
+
+  // Si viene inventario detallado (vista de detalle), calcula desde ahí.
+  // Si no (vista de listado/catálogo), usa el stock_total que trae el propio listado.
+  const totalStock = inventario.length > 0
+    ? inventario.reduce((sum, i) => sum + i.stock, 0)
+    : (p.stock_total ?? 0);
+
+  const estado: StockStatus = totalStock === 0 ? "agotado" : totalStock <= 3 ? "ultimas-unidades" : "disponible";
+
+  const imagenPrincipal = p.imagen_principal || p.imagenes?.find(i => i.es_principal)?.url || "";
+  const todasImagenes = p.imagenes?.map(i => i.url) || (imagenPrincipal ? [imagenPrincipal] : []);
+
+  return {
+    id: p.id,
+    name: p.nombre,
+    subtitle: p.tipo || "",
+    price: Number(p.precio_oferta || p.precio),
+    colors: coloresUnicos.length > 0 ? coloresUnicos : ["#a08e6c"],
+    sizes: tallasUnicas,
+    unavailableSizes: unavailableSizes.length > 0 ? unavailableSizes : undefined,
+    stock: estado,
+    stockCount: totalStock,
+    isNew: p.destacado,
+    gradient: `linear-gradient(160deg,#d9cdb0,${coloresUnicos[0] || "#a08e6c"})`,
+    image: imagenPrincipal,
+    images: todasImagenes,
+    description: p.descripcion,
+    rating: 5,
+    reviewCount: 0,
+  };
+}
+
+export async function fetchProductos(params?: {
+  tipo?: string; talla?: string; color?: string; sort?: string; page?: number; pageSize?: number;
+}): Promise<{ productos: Product[]; total: number; totalPages: number }> {
+  const query = new URLSearchParams();
+  if (params?.tipo) query.set("tipo", params.tipo);
+  if (params?.talla) query.set("talla", params.talla);
+  if (params?.color) query.set("color", params.color);
+  if (params?.sort) query.set("sort", params.sort);
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.pageSize) query.set("pageSize", String(params.pageSize));
+
+  const res = await fetch(`${API_URL}/productos?${query.toString()}`);
+  const data = await res.json();
+  return {
+    productos: (data.productos || []).map(adaptarProducto),
+    total: data.total || 0,
+    totalPages: data.totalPages || 1,
+  };
+}
+
+export async function fetchProducto(id: string): Promise<Product | null> {
+  const res = await fetch(`${API_URL}/productos/${id}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  return adaptarProducto(data);
+}

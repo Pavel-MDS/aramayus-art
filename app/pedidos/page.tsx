@@ -1,17 +1,32 @@
-import { redirect } from 'next/navigation';
+"use client";
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
+import { useRouter } from 'next/navigation';
 import { Package } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 interface ItemPedido {
+  id: number;
+  producto_id: string;
+  nombre_producto: string;
+  talla: string;
+  color: string | null;
+  cantidad: number;
+  precio_unitario: string;
+}
+
+interface Pedido {
   id: string;
-  name: string;
-  image: string;
-  size: string;
-  color: string;
-  price: number;
-  quantity: number;
+  subtotal: string;
+  envio: string;
+  igv: string;
+  total: string;
+  estado: string;
+  created_at: string;
+  items?: ItemPedido[];
 }
 
 const ESTADOS: Record<string, { label: string; className: string }> = {
@@ -22,23 +37,33 @@ const ESTADOS: Record<string, { label: string; className: string }> = {
   cancelado: { label: 'Cancelado',         className: 'text-red-600 bg-red-50' },
 };
 
-export default async function PedidosPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function PedidosPage() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!user) redirect('/login?redirect=/pedidos');
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login?redirect=/pedidos');
+      return;
+    }
+    if (user) {
+      apiFetch('/pedidos')
+        .then(setPedidos)
+        .finally(() => setLoading(false));
+    }
+  }, [user, authLoading, router]);
 
-  const { data: pedidos } = await supabase
-    .from('pedidos')
-    .select('*')
-    .eq('usuario_id', user.id)
-    .order('created_at', { ascending: false });
+  if (authLoading || loading) {
+    return <div className="max-w-3xl mx-auto px-6 py-12 text-center text-muted text-sm">Cargando...</div>;
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
       <h1 className="font-serif-display text-[28px] text-dark mb-8">Mis pedidos</h1>
 
-      {!pedidos || pedidos.length === 0 ? (
+      {pedidos.length === 0 ? (
         <div className="text-center py-20">
           <Package size={40} className="text-muted/30 mx-auto mb-4" />
           <p className="text-[13px] text-muted mb-4">Aún no tienes pedidos</p>
@@ -49,9 +74,7 @@ export default async function PedidosPage() {
       ) : (
         <div className="space-y-4">
           {pedidos.map((pedido) => {
-            const items = pedido.items as ItemPedido[];
             const estado = ESTADOS[pedido.estado] ?? ESTADOS.pendiente;
-
             return (
               <div key={pedido.id} className="border border-border-subtle rounded-xl p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -68,23 +91,6 @@ export default async function PedidosPage() {
                   <span className={`text-[10px] font-medium px-3 py-1 rounded-full ${estado.className}`}>
                     {estado.label}
                   </span>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex gap-3 items-center">
-                      <div className="relative w-12 h-14 rounded-md overflow-hidden flex-shrink-0 bg-cream-deep">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" sizes="48px" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-medium text-dark truncate">{item.name}</p>
-                        <p className="text-[10px] text-muted">Talla {item.size} · x{item.quantity}</p>
-                      </div>
-                      <p className="text-[12px] text-terracotta font-medium">
-                        S/ {(item.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
                 </div>
 
                 <div className="flex justify-between items-center pt-3 border-t border-border-subtle">

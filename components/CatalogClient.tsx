@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { products as allProducts, Product } from "@/lib/products";
+import { Product } from "@/lib/products";
 
 const SIZES = ["S", "M", "L", "XL", "Única"];
 const COLOR_GROUPS: { label: string; hex: string }[] = [
@@ -33,7 +33,7 @@ function productType(p: Product) {
   return p.name.split(" ")[0];
 }
 
-export function CatalogClient() {
+export function CatalogClient({ initialProducts }: { initialProducts: Product[] }) {
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -47,7 +47,7 @@ export function CatalogClient() {
   }
 
   const filtered = useMemo(() => {
-    let result = allProducts.filter((p) => {
+    let result = initialProducts.filter((p) => {
       const sizeMatch =
         selectedSizes.length === 0 || p.sizes.some((s) => selectedSizes.includes(s));
       const colorMatch =
@@ -62,7 +62,7 @@ export function CatalogClient() {
     if (sort === "precio-desc") result = [...result].sort((a, b) => b.price - a.price);
 
     return result;
-  }, [selectedSizes, selectedColors, selectedTypes, sort]);
+  }, [selectedSizes, selectedColors, selectedTypes, sort, initialProducts]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);

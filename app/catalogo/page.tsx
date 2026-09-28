@@ -1,13 +1,14 @@
-// app/ catalogo/page.tsx
 import { CatalogClient } from "@/components/CatalogClient";
-import { products } from "@/lib/products";
+import { fetchProductos } from "@/lib/products";
 
 export const metadata = {
   title: "Catálogo — Aramayu's Art",
   description: "Explora nuestra colección de prendas de alpaca cusqueña.",
 };
 
-export default function CatalogoPage() {
+export default async function CatalogoPage() {
+  const { productos, total } = await fetchProductos({ pageSize: 50 });
+
   return (
     <main className="max-w-[1280px] mx-auto px-6 sm:px-10">
       <div className="pt-10">
@@ -19,11 +20,11 @@ export default function CatalogoPage() {
           Prendas de alpaca cusqueña
         </h1>
         <p className="text-[12px] text-muted">
-          {products.length} productos disponibles
+          {total} productos disponibles
         </p>
       </div>
 
-      <CatalogClient />
+      <CatalogClient initialProducts={productos} />
     </main>
   );
 }
